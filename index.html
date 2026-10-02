@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -737,16 +736,16 @@
 
 <!-- ============ ADMIN MODE (hidden until the footer link is used) ============ -->
 <div class="ad-overlay" id="adLoginOverlay" hidden>
-  <div class="ad-login" id="adLoginForm">
+  <form class="ad-login" id="adLoginForm" autocomplete="off">
     <div class="ad-title">Admin Login</div>
     <p class="ad-sub">Enter the admin password to edit products.</p>
-    <input type="password" id="adPassword" placeholder="Password" autocomplete="off" aria-label="Admin password">
+    <input type="password" id="adPassword" placeholder="Password" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Admin password">
     <p class="ad-error" id="adLoginError" role="alert"></p>
     <div class="ad-row">
       <button type="button" class="ad-btn ad-btn-ghost" id="adLoginCancel">Cancel</button>
-      <button type="button" class="ad-btn ad-btn-primary" id="adLoginSubmit">Unlock</button>
+      <button type="submit" class="ad-btn ad-btn-primary" id="adLoginSubmit">Unlock</button>
     </div>
-  </div>
+  </form>
 </div>
 
 <div class="ad-panel" id="adPanel" hidden>
@@ -1050,7 +1049,6 @@
   });
   byId('adLoginCancel').addEventListener('click', closeLogin);
   adLoginOverlay.addEventListener('click', (e) => { if (e.target === adLoginOverlay) closeLogin(); });
-  // Plain button + Enter key (instead of a <form> submit) so it also works in sandboxed previews
   function tryLogin(){
     if (normalizePw(adPassword.value) === normalizePw(ADMIN_PASSWORD)){
       adminUnlocked = true;
@@ -1061,10 +1059,10 @@
       adPassword.select();
     }
   }
-  byId('adLoginSubmit').addEventListener('click', tryLogin);
-  adPassword.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter'){ e.preventDefault(); tryLogin(); }
-  });
+  byId('adLoginForm').addEventListener('submit', (e) => { e.preventDefault(); tryLogin(); });
+  // Safety net: some restricted/sandboxed preview windows block real form
+  // submission entirely, so a plain click still works there too.
+  byId('adLoginSubmit').addEventListener('click', (e) => { e.preventDefault(); tryLogin(); });
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     if (!adLoginOverlay.hidden) closeLogin();
